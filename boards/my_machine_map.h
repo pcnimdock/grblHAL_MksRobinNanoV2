@@ -11,7 +11,10 @@
   per axis (NOT routed to a hardware USART peripheral) -> handled here with
   a bit-banged software UART, see boards/my_machine.c
 
-  Spindle control is ON/OFF only (relay on the HEATER2 pin, PB0), no PWM.
+  Spindle control is ON/OFF only, no PWM. The output is PB0, which is the
+  connector silkscreened HE1 on the board (the schematic calls that net
+  HEATER2 - do not let that mislead you; HE0 / schematic net HEATER1 is PC3
+  and is NOT the pin used here).
 
   Endstop / probe wiring (confirmed against the working Marlin config, which
   has Z_HOME_DIR = +1 and USE_ZMAX_PLUG):
@@ -23,6 +26,13 @@
 
   All four are active low (Marlin's *_ENDSTOP_INVERTING true), which is
   grblHAL's default -> leave $5=0.
+
+  Per the MKS schematic (ENDstops.SchDoc) each of these MCU pins is a shared
+  node: the endstop connector AND the corresponding TMC2209 DIAG line, bridged
+  by an unpopulated jumper (J21..J25 / header J20). PA15 is X-0 and X-DIAG,
+  PA12 is Y-0 and Y-DIAG, PA11 is Z-0 and Z-DIAG, PC4 is Z+0 and E0-DIAG.
+  Those jumpers are open from the factory, so the pins carry only the switches
+  - which is why sensorless homing must stay off: it would need the same pins.
 
   This board has NOT been tested on real hardware yet - verify polarity of
   limit switches ($5), enable pins ($4) and stepper direction ($3) once
@@ -115,13 +125,18 @@
 #define M3_ENABLE_PIN               3   // PB3
 #endif
 
-// Spindle relay, ON/OFF only (Marlin's HEATER_1_PIN / "HEATER2" on the silk).
+// Spindle relay, ON/OFF only. PB0 = the HE1 screw terminal on J13 (Marlin's
+// HEATER_1_PIN; the schematic labels this net HEATER2).
+// NOTE: the driver does support hardware PWM on this exact pin (PB0 is
+// TIM1_CH2N, see the table in Inc/driver.h) if you ever fit a spindle
+// controller with a PWM input - it would need no rewiring, just the
+// SPINDLE_PWM_PORT/PIN defines. Pointless while PB0 drives a relay.
 #define AUXOUTPUT0_PORT            GPIOB // Spindle enable
 #define AUXOUTPUT0_PIN              0    // PB0
 
-// Flood coolant on the FAN mosfet (Marlin's FAN0_PIN). Harmless if nothing is
-// wired there - it just gives you M8/M9. Comment out the COOLANT_FLOOD_* lines
-// below if you would rather keep the pin free.
+// Flood coolant on the FAN mosfet (J12, Marlin's FAN0_PIN). Harmless if nothing
+// is wired there - it just gives you M8/M9. Comment out the COOLANT_FLOOD_*
+// lines below if you would rather keep the pin free.
 #define AUXOUTPUT1_PORT            GPIOB // Coolant flood
 #define AUXOUTPUT1_PIN              1    // PB1
 
