@@ -1851,11 +1851,14 @@ bool driver_init (void)
 
     __HAL_AFIO_REMAP_SWJ_NOJTAG();
 
+#ifndef MCU_NAME
 #ifdef STM32F103_ZE_
-    hal.info = "STM32F103ZE";
+#define MCU_NAME "STM32F103ZE"
 #else
-    hal.info = "STM32F103RC";
+#define MCU_NAME "STM32F103RC"
 #endif
+#endif
+    hal.info = MCU_NAME;
     hal.driver_version = "260728";
     hal.driver_url = GRBL_URL "/STM32F1xx";
 #ifdef BOARD_NAME

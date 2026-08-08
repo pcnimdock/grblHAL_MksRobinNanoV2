@@ -259,7 +259,7 @@
 #error SD card plugin not supported!
 #endif
 
-#if TRINAMIC_ENABLE && !(defined(BOARD_CNC_BOOSTERPACK) || defined(BOARD_BTT_SKR_MINI_E3_V20) || defined(BOARD_BTT_SKR_MINI_E3_V20_ALT2))
+#if TRINAMIC_ENABLE && !(defined(BOARD_CNC_BOOSTERPACK) || defined(BOARD_BTT_SKR_MINI_E3_V20) || defined(BOARD_BTT_SKR_MINI_E3_V20_ALT2) || defined(BOARD_MY_MACHINE))
 #error Trinamic plugin not supported!
 #endif
 
