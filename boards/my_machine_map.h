@@ -162,19 +162,28 @@
 // No safety door / reset / feed hold / cycle start wired on this build -
 // grblHAL works fine without them (use serial real-time commands instead).
 //
-// OPTIONAL HARDWARE E-STOP: the MT_DET2 header (PE6) is free and its EXTI line
-// (6) is unused, so it can carry an emergency stop. Wire a normally-closed
-// switch between the signal pin and GND and uncomment the three lines below.
-// Left commented on purpose: an unwired input sits on a pull-up and would only
-// ever be a nuisance-trip risk.
+// HARDWARE E-STOP on the MT_DET2 header (PE6). EXTI line 6 is unused, and the
+// board already provides the conditioning: R36 pulls the net to +3V3, R37 is in
+// series and C32 filters to ground (MKS schematic, P-AUX sheet), so a bare
+// switch needs no extra components.
+//
+// Wire a NORMALLY CLOSED button between the signal pin and GND. Idle = closed =
+// LOW = not triggered; pressed, or the cable cut, = open = pulled HIGH =
+// triggered. That is why $14 must stay 0: grblHAL reads the raw pin and treats
+// HIGH as asserted, so a broken wire trips the e-stop instead of silently
+// disabling it.
 //
 // Do NOT use the MT_DET1 header (PA4) for this - PA4 shares EXTI line 4 with
 // the Z limit on PC4, and only one port can drive a given EXTI line.
 //
-//#define AUXINPUT1_PORT             GPIOE // E-stop, MT_DET2 header
-//#define AUXINPUT1_PIN               6    // PE6
-//#define RESET_PORT                 AUXINPUT1_PORT
-//#define RESET_PIN                  AUXINPUT1_PIN
+#define AUXINPUT1_PORT             GPIOE // E-stop, MT_DET2 header
+#define AUXINPUT1_PIN               6    // PE6
+
+// With ESTOP_ENABLE (which defaults to 1 at COMPATIBILITY_LEVEL 0) grblHAL maps
+// RESET_PIN to the e_stop signal rather than a soft reset: protocol_main_loop()
+// raises Alarm_EStop and blocks everything until the button is released.
+#define RESET_PORT                 AUXINPUT1_PORT
+#define RESET_PIN                  AUXINPUT1_PIN
 
 #if SDCARD_ENABLE
 // Onboard SD (SDIO) is NOT supported by this map - only add SPI SD card

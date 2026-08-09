@@ -57,6 +57,35 @@ const settings_restore_t settings_all = {
     .driver_parameters = SETTINGS_RESTORE_DRIVER_PARAMETERS
 };
 
+// Allow the per axis homing rates and the "per axis feedrates" flag to be set
+// at compile time. Upstream only has the global DEFAULT_HOMING_SEEK_RATE /
+// DEFAULT_HOMING_FEED_RATE, which every axis then shares, and no macro at all
+// for homing.flags.per_axis_feedrates - so a machine whose Z homes at a
+// different rate than X/Y could only be configured with runtime $ commands.
+// Every macro below falls back to the upstream behaviour when left undefined,
+// so this changes nothing unless you define them.
+#ifndef DEFAULT_HOMING_PER_AXIS_FEEDRATES
+#define DEFAULT_HOMING_PER_AXIS_FEEDRATES Off
+#endif
+#ifndef DEFAULT_X_HOMING_SEEK_RATE
+#define DEFAULT_X_HOMING_SEEK_RATE DEFAULT_HOMING_SEEK_RATE
+#endif
+#ifndef DEFAULT_Y_HOMING_SEEK_RATE
+#define DEFAULT_Y_HOMING_SEEK_RATE DEFAULT_HOMING_SEEK_RATE
+#endif
+#ifndef DEFAULT_Z_HOMING_SEEK_RATE
+#define DEFAULT_Z_HOMING_SEEK_RATE DEFAULT_HOMING_SEEK_RATE
+#endif
+#ifndef DEFAULT_X_HOMING_FEED_RATE
+#define DEFAULT_X_HOMING_FEED_RATE DEFAULT_HOMING_FEED_RATE
+#endif
+#ifndef DEFAULT_Y_HOMING_FEED_RATE
+#define DEFAULT_Y_HOMING_FEED_RATE DEFAULT_HOMING_FEED_RATE
+#endif
+#ifndef DEFAULT_Z_HOMING_FEED_RATE
+#define DEFAULT_Z_HOMING_FEED_RATE DEFAULT_HOMING_FEED_RATE
+#endif
+
 PROGMEM static const settings_t defaults = {
 
     .version.id = SETTINGS_VERSION,
@@ -138,6 +167,7 @@ PROGMEM static const settings_t defaults = {
     .homing.flags.keep_on_reset = DEFAULT_HOMING_KEEP_STATUS_ON_RESET,
     .homing.flags.use_limit_switches = DEFAULT_HOMING_USE_LIMIT_SWITCHES,
     .homing.flags.nx_scrips_on_homed_only = DEFAULT_RUN_STARTUP_SCRIPTS_ONLY_ON_HOMED,
+    .homing.flags.per_axis_feedrates = DEFAULT_HOMING_PER_AXIS_FEEDRATES,
 #else
     .homing.flags.value = 0,
 #endif
@@ -248,8 +278,8 @@ PROGMEM static const settings_t defaults = {
     .axis[X_AXIS].jerk = (DEFAULT_X_JERK * 60.0f * 60.0f * 60.0f),
     .axis[X_AXIS].max_travel = (-DEFAULT_X_MAX_TRAVEL),
     .axis[X_AXIS].dual_axis_offset = 0.0f,
-    .axis[X_AXIS].homing_feed_rate = DEFAULT_HOMING_FEED_RATE,
-    .axis[X_AXIS].homing_seek_rate = DEFAULT_HOMING_SEEK_RATE,
+    .axis[X_AXIS].homing_feed_rate = DEFAULT_X_HOMING_FEED_RATE,
+    .axis[X_AXIS].homing_seek_rate = DEFAULT_X_HOMING_SEEK_RATE,
 #if ENABLE_BACKLASH_COMPENSATION
     .axis[X_AXIS].backlash = 0.0f,
 #endif
@@ -260,8 +290,8 @@ PROGMEM static const settings_t defaults = {
     .axis[Y_AXIS].acceleration = (DEFAULT_Y_ACCELERATION * 60.0f * 60.0f),
     .axis[Y_AXIS].jerk = (DEFAULT_Y_JERK * 60.0f * 60.0f * 60.0f),
     .axis[Y_AXIS].dual_axis_offset = 0.0f,
-    .axis[Y_AXIS].homing_feed_rate = DEFAULT_HOMING_FEED_RATE,
-    .axis[Y_AXIS].homing_seek_rate = DEFAULT_HOMING_SEEK_RATE,
+    .axis[Y_AXIS].homing_feed_rate = DEFAULT_Y_HOMING_FEED_RATE,
+    .axis[Y_AXIS].homing_seek_rate = DEFAULT_Y_HOMING_SEEK_RATE,
 #if ENABLE_BACKLASH_COMPENSATION
     .axis[Y_AXIS].backlash = 0.0f,
 #endif
@@ -272,8 +302,8 @@ PROGMEM static const settings_t defaults = {
     .axis[Z_AXIS].jerk = (DEFAULT_Z_JERK * 60.0f * 60.0f * 60.0f),
     .axis[Z_AXIS].max_travel = (-DEFAULT_Z_MAX_TRAVEL),
     .axis[Z_AXIS].dual_axis_offset = 0.0f,
-    .axis[Z_AXIS].homing_feed_rate = DEFAULT_HOMING_FEED_RATE,
-    .axis[Z_AXIS].homing_seek_rate = DEFAULT_HOMING_SEEK_RATE,
+    .axis[Z_AXIS].homing_feed_rate = DEFAULT_Z_HOMING_FEED_RATE,
+    .axis[Z_AXIS].homing_seek_rate = DEFAULT_Z_HOMING_SEEK_RATE,
 #if ENABLE_BACKLASH_COMPENSATION
     .axis[Z_AXIS].backlash = 0.0f,
 #endif
